@@ -10,7 +10,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(builder.
 
 
 
-
 var app = builder.Build();
 app.UseHsts();
 app.UseHttpsRedirection();
