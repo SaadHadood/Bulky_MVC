@@ -23,8 +23,32 @@ public class CategoryController : Controller
     [HttpPost]
     public IActionResult CreateCategory(CategoryModel obj)
     {
-        _db.Categories.Add(obj);
-        _db.SaveChanges();
-        return RedirectToAction("Index");
+        if (obj.Name == obj.DisplayOrder.ToString())
+        {
+            ModelState.AddModelError("name", "The DisplayOrder cannot exactly match the name");
+        }
+
+        if (ModelState.IsValid) 
+        {
+            _db.Categories.Add(obj);
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        return View();
+
     }
+    [HttpDelete]
+    public IActionResult DeleteCategory(int id)
+    {
+
+        var category = _db.Categories.FirstOrDefault(c => c.Id == id);
+        if (category != null) 
+        {
+            _db.Categories.Remove(category);
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        return View();
+    }
+
 }
