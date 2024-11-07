@@ -34,7 +34,6 @@ public class DeleteModel : PageModel
 
     public IActionResult OnPost(int? id)
     {
-        if (id == null || id == 0) { return NotFound(); }
         CategoryModel? obj = _db.Categories.FirstOrDefault(c => c.Id == id);
         if (obj == null) { return NotFound(); }
 

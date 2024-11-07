@@ -34,7 +34,7 @@ public class EditModel : PageModel
             TempData["success"] = "Category Edit successfully";
             return RedirectToPage("Index");
         }
-        return RedirectToPage("Index");
+        return Page();
     }
 
 
