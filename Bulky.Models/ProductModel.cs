@@ -13,9 +13,9 @@ public class ProductModel
     public int Id { get; set; }
     [Required]
     public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public string? Description { get; set; }
     [Required]
-    public decimal ISBN { get; set; }
+    public string ISBN { get; set; } = null!;
     [Required]
     public string Author { get; set; } = null!;
 
