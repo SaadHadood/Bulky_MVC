@@ -2,8 +2,9 @@
 using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
 using Microsoft.AspNetCore.Mvc;
-namespace BulkyWeb.Controllers;
+namespace BulkyWeb.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class CategoryController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -30,7 +31,7 @@ public class CategoryController : Controller
             ModelState.AddModelError("name", "The DisplayOrder cannot exactly match the name");
         }
 
-        if (ModelState.IsValid) 
+        if (ModelState.IsValid)
         {
             _unitOfWork.Category.Add(obj);
             _unitOfWork.Save();
@@ -42,7 +43,7 @@ public class CategoryController : Controller
     }
 
     //Edit
-    public IActionResult EditCategory(int? id) 
+    public IActionResult EditCategory(int? id)
     {
         if (id == null || id == 0) { return NotFound(); }
         CategoryModel? CategoryFromDb = _unitOfWork.Category.Get(c => c.Id == id);
@@ -53,8 +54,8 @@ public class CategoryController : Controller
     }
 
     [HttpPost]
-    public IActionResult EditCategory(CategoryModel obj) 
-    { 
+    public IActionResult EditCategory(CategoryModel obj)
+    {
         if (ModelState.IsValid)
         {
             _unitOfWork.Category.Update(obj);
@@ -76,7 +77,7 @@ public class CategoryController : Controller
 
         return View(CategoryFromDb);
     }
-    [HttpPost, ActionName ("DeleteCategory")]
+    [HttpPost, ActionName("DeleteCategory")]
     public IActionResult DeleteCategoryPost(int? id)
     {
         CategoryModel? obj = _unitOfWork.Category.Get(c => c.Id == id);
