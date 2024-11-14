@@ -1,7 +1,9 @@
 ﻿using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
+using Bulky.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Build.Tasks.Deployment.Bootstrapper;
 using System.Collections.Generic;
 
 namespace BulkyWeb.Areas.Admin.Controllers;
@@ -26,22 +28,23 @@ public class ProductController : Controller
 
     public IActionResult CreateProduct()
     {
-        //CategoryList Dropdown
-        IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+        ProductVM productVM = new()
         {
-            Text = u.Name,
-            Value = u.Id.ToString()
-        });
+            CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.Id.ToString()
+            }),
+            Product = new ProductModel()
+        };
 
-        ViewBag.CategoryList = CategoryList;
-
-        return View();
+        return View(productVM);
     }
 
     [HttpPost]
-    public IActionResult CreateProduct(ProductModel obj)
+    public IActionResult CreateProduct(ProductVM productVM)
     {
-        var existingProduct = _unitOfWork.Product.Get(p => p.Title == obj.Title && p.ISBN == obj.ISBN);
+        var existingProduct = _unitOfWork.Product.Get(p => p.Title == productVM.Product.Title && p.ISBN == productVM.Product.ISBN);
         if (existingProduct != null)
         {
             ModelState.AddModelError("CustomError", "A product with the same Title and ISBN already exists.");
@@ -49,12 +52,22 @@ public class ProductController : Controller
 
         if (ModelState.IsValid) 
         {
-            _unitOfWork.Product.Add(obj);
+            _unitOfWork.Product.Add(productVM.Product);
             _unitOfWork.Save();
             TempData["success"] = "Product Created successfully";
             return RedirectToAction("Index");
         }
-        return View();
+
+        else
+        {
+
+            productVM.CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.Id.ToString()
+            });
+            return View(productVM);
+        }
     }
 
     //Edit
