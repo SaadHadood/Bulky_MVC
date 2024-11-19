@@ -21,7 +21,7 @@ public class ProductController : Controller
 
     public IActionResult Index()
     {
-        List<ProductModel> products = _unitOfWork.Product.GetAll().ToList();
+        List<ProductModel> products = _unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
 
         return View(products);
     }
@@ -57,30 +57,51 @@ public class ProductController : Controller
     [HttpPost]
     public IActionResult UpsertProduct(ProductVM productVM, IFormFile? file)
     {
-        var existingProduct = _unitOfWork.Product.Get(p => p.Title == productVM.Product.Title && p.ISBN == productVM.Product.ISBN);
-        if (existingProduct != null)
-        {
-            ModelState.AddModelError("CustomError", "A product with the same Title and ISBN already exists.");
-        }
 
         if (ModelState.IsValid) 
         {
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            string wwwRootPath = _webHostEnvironment.WebRootPath; //Var filen ska sparars.
             if (file != null) 
             { 
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string productPath = Path.Combine(wwwRootPath, @"images\product");
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); //skapa id och hämta filändelsen.
+                string productPath = Path.Combine(wwwRootPath, @"images\product"); //sparas i images/product.
+
+                if (!string.IsNullOrEmpty(productVM.Product.ImageUrl)) 
+                {
+                    //delete the old image
+                    var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath)) 
+                    { 
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
 
                 using (var fileStram = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                 {
                     file.CopyTo(fileStram);
                 }
 
-                productVM.Product.ImageUrl = @"\images\product" + fileName;
+                productVM.Product.ImageUrl = @"\images\product\" + fileName;
             
             }
 
-            _unitOfWork.Product.Add(productVM.Product);
+            if (productVM.Product.Id == 0)
+            {
+                var existingProduct = _unitOfWork.Product.Get(p => p.Title == productVM.Product.Title && p.ISBN == productVM.Product.ISBN);
+                if (existingProduct != null)
+                {
+                    ModelState.AddModelError("CustomError", "A product with the same Title and ISBN already exists.");
+                }
+                _unitOfWork.Product.Add(productVM.Product);
+
+            }
+            else
+            {
+                _unitOfWork.Product.Update(productVM.Product);
+
+            }
+
             _unitOfWork.Save();
             TempData["success"] = "Product Created successfully";
             return RedirectToAction("Index");
