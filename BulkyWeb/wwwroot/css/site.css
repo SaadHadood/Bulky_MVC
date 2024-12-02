@@ -555,3 +555,15 @@ bg-success {
         border-color: #578553;
     }
 
+.img-fixed {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.product-card.card {
+    width: auto;
+    max-width: 250px;
+    margin: 0 auto;
+}
