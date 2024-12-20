@@ -14,9 +14,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<CategoryModel> Categories { get; set; }
     public DbSet<ProductModel> Products { get; set; }
-    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<CompanyModel> Companies { get; set; }
-
+    public DbSet<ShoppingCartModel> ShoppingCarts { get; set; }
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
